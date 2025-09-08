@@ -9,6 +9,7 @@ module RubyLLM
     class Bedrock < Provider
       include Bedrock::Chat
       include Bedrock::Streaming
+      include Bedrock::Embeddings
       include Bedrock::Models
       include Bedrock::Signing
       include Bedrock::Media
@@ -74,6 +75,12 @@ module RubyLLM
           req.headers.merge! build_headers(signature.headers, streaming: block_given?)
           req.headers = additional_headers.merge(req.headers) unless additional_headers.empty?
         end
+      end
+
+      def embed(text, dimensions:, model: nil)
+        payload = render_embedding_payload(text, model:, dimensions:)
+        response = presigned_post(@connection, embedding_url(model:), payload)
+        parse_embedding_response response, model:, text:
       end
 
       class << self

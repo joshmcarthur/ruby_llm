@@ -23,13 +23,18 @@ RSpec.describe RubyLLM::Embedding do
 
       it "#{provider}/#{model} can handle a single text with custom dimensions" do
         skip 'Mistral does not support custom dimensions' if provider == :mistral
+        skip 'Titan Text v1 does not support custom dimensions' if model.include?('amazon.titan-embed-text-v1')
+        dimensions = test_dimensions
+        dimensions = 512 if provider == :bedrock # Titan embed text v2 does not support 768 dimensions
 
-        embedding = RubyLLM.embed(test_text, model: model, provider: provider, dimensions: test_dimensions)
+        embedding = RubyLLM.embed(test_text, model: model, provider: provider, dimensions:)
         expect(embedding.vectors).to be_an(Array)
-        expect(embedding.vectors.length).to eq(test_dimensions)
+        expect(embedding.vectors.length).to eq(dimensions)
       end
 
       it "#{provider}/#{model} can handle multiple texts" do
+        skip 'Bedrock does not support multiple texts' if provider == :bedrock
+
         embeddings = RubyLLM.embed(test_texts, model: model)
         expect(embeddings.vectors).to be_an(Array)
         expect(embeddings.vectors.size).to eq(3)
@@ -40,6 +45,7 @@ RSpec.describe RubyLLM::Embedding do
 
       it "#{provider}/#{model} can handle multiple texts with custom dimensions" do
         skip 'Mistral does not support custom dimensions' if provider == :mistral
+        skip 'Bedrock does not support multiple texts' if provider == :bedrock
 
         embeddings = RubyLLM.embed(test_texts, model: model, provider: provider, dimensions: test_dimensions)
         expect(embeddings.vectors).to be_an(Array)
@@ -49,6 +55,8 @@ RSpec.describe RubyLLM::Embedding do
       end
 
       it "#{provider}/#{model} handles single-string arrays consistently" do
+        skip 'Bedrock does not support multiple texts' if provider == :bedrock
+
         embeddings = RubyLLM.embed(['Ruby is great'], model: model, provider: provider)
         expect(embeddings.vectors).to be_an(Array)
         expect(embeddings.vectors.size).to eq(1)

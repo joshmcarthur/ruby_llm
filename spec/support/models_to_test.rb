@@ -42,5 +42,7 @@ EMBEDDING_MODELS = [
   { provider: :gemini, model: 'text-embedding-004' },
   { provider: :openai, model: 'text-embedding-3-small' },
   { provider: :mistral, model: 'mistral-embed' },
-  { provider: :vertexai, model: 'text-embedding-004' }
+  { provider: :vertexai, model: 'text-embedding-004' },
+  { provider: :bedrock, model: 'amazon.titan-embed-text-v2:0' },
+  { provider: :bedrock, model: 'amazon.titan-embed-text-v1' }
 ].freeze
