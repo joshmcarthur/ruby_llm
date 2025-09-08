@@ -68,6 +68,14 @@ module RubyLLM
         )
       end
 
+      def presigned_post(connection, path, payload, additional_headers = {})
+        signature = sign_request("#{connection.connection.url_prefix}#{path}", payload:)
+        connection.post path, payload do |req|
+          req.headers.merge! build_headers(signature.headers, streaming: block_given?)
+          req.headers = additional_headers.merge(req.headers) unless additional_headers.empty?
+        end
+      end
+
       class << self
         def capabilities
           Bedrock::Capabilities
